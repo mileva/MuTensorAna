@@ -1373,7 +1373,6 @@ void NewMuonAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
 
     if ((fDeltaPhi > (PI - deltaPhiCut)) && (fDeltaPhi < (PI + deltaPhiCut)))
     {
-            std::cout << "echo from delta phi selection" << std::endl;
       totalrecoSelDphiNom->Fill(massVrtx);
       totalrecoSelDphiNomMyMass->Fill(motherParticle.M());
 
