@@ -112,8 +112,6 @@ public:
   bool IsMuMatchedToMCZ(const reco::Candidate * dau, reco::Muon myMu, double DR, double DPtRel);
   bool IsMuMatchedToMCZ1(const reco::Candidate * dau, reco::Muon myMu, double DR);
 
-  //  typedef std::vector<std::string> vstring;
-
 private:
   virtual void
   beginJob();
@@ -121,7 +119,6 @@ private:
   analyze(const edm::Event&, const edm::EventSetup&);
   virtual void
   endJob();
-  //  bool IsMuMatchedToHLTMu(const reco::Muon &, std::vector<reco::Particle>, double, double);
 
   virtual void
   beginRun(edm::Run const&, edm::EventSetup const&);
@@ -133,15 +130,12 @@ private:
   endLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&);
 
   // ----------member data ---------------------------
-  //for trigger
   edm::InputTag trigTag_;
   edm::InputTag trigEv_;
   edm::TriggerNames const* trigNames_;
   std::string HLTPathsByName_;
-//  std::vector<std::string> HLTPathsByName_;
 
   std::string L3FilterName_;
-  //  vstring L3FilterName_;
   std::string L1FilterName_;
   std::string m_nameAlgTechTrig;
 
@@ -149,7 +143,6 @@ private:
   bool DY_;
   bool ZStar_;
 
-  //  double etaCut;
   double isoCut;
   int trackLayersCut;
   double pTcut;
@@ -171,11 +164,8 @@ private:
   double signalBandMax;
   double rightBandMin;
   double rightBandMax;
-
   const reco::GenParticleCollection* theGenParticleCollection;
-
   double massMin;
-
   const bool check_l1;
   const edm::InputTag trigger_summary_src;
   const double hlt_single_min_pt;
@@ -184,7 +174,6 @@ private:
   const double acceptance_max_eta_1;
   const double acceptance_max_eta_2;
   const double acceptance_min_pt;
-
   double maxDPtRel_, maxDeltaR_, maxDeltaRMatchTrigger_;
 
   std::vector<int> vicosthetaPlus;
@@ -206,7 +195,6 @@ private:
 
   TH1F *recoVsAcceptDenom;//geom and kinematick accepted
 
-//  TH1F *totalrecoNoSelectNom;
   TH1F *totalrecoNom;
   TH1F *totalrecoNomMyMass;
 
@@ -239,7 +227,6 @@ private:
   TH1F *recoSelDphiNomBosonMassMCMatchMyMass;
   TH1F *diff_SelDphiBosonMassMCMatchMyMass;
 
-  //no deltaPt match
   TH1F *recoHighPtSelMCMatchNopt;
   TH1F *recoHighPtSelMCMatchMyMassNopt;
   TH1F *recoHighPtSelNomBosonMassMCMatchNopt;
@@ -281,15 +268,11 @@ NewMuonAna::NewMuonAna(const edm::ParameterSet& iConfig) :
       hlt_single_min_pt(iConfig.getParameter<double> ("hlt_single_min_pt")),//
       hlt_single_max_eta(iConfig.getParameter<double> ("hlt_single_max_eta")),//
       checking_prescaled_path(iConfig.getParameter<bool> ("checking_prescaled_path")),//
-
-      //for trigger
       trigTag_(iConfig.getParameter<edm::InputTag> ("TrigTag")),//
       trigEv_(iConfig.getParameter<edm::InputTag> ("triggerEvent")),//
-      //      L3FilterName_(iConfig.getParameter<vstring> ("L3FilterName")),//
       L3FilterName_(iConfig.getParameter<std::string> ("L3FilterName")),//
       L1FilterName_(iConfig.getParameter<std::string> ("L1FilterName")),//
       HLTPathsByName_(iConfig.getParameter<std::string> ("hltPath")),//
-//      HLTPathsByName_(iConfig.getParameter<std::vector<std::string> > ("hltPaths")),//
       m_nameAlgTechTrig(iConfig.getParameter<std::string> ("AlgorithmName")),//
       maxDPtRel_(iConfig.getParameter<double> ("maxDPtRel")),//
       maxDeltaR_(iConfig.getParameter<double> ("maxDeltaR")),//
@@ -299,7 +282,6 @@ NewMuonAna::NewMuonAna(const edm::ParameterSet& iConfig) :
 {
   massMin = iConfig.getParameter<double> ("myMassMin");
   mcdata = iConfig.getParameter<bool> ("mymcdata");
-  //  etaCut = iConfig.getParameter<double> ("myetaCut");
   isoCut = iConfig.getParameter<double> ("myisoCut");
   trackLayersCut = iConfig.getParameter<int> ("mytrackLayersCut");
   pTcut = iConfig.getParameter<double> ("mypTcut");
@@ -336,7 +318,7 @@ NewMuonAna::~NewMuonAna()
 {
 }
 
-// ------------ method called for each event  ------------
+// ------------ method called for each event ------------
 
 void NewMuonAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
@@ -360,22 +342,13 @@ void NewMuonAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
 
   double Massgenerated = 0.;
 
-  //  bool singleTrigFlag1 = false;
-  //  bool singleTrigFlag2 = false;
-
   double deltaR1 = 0.;
-  //  double deltaR2 = 0.;
   double deltaPt1 = 0.;
-  //  double deltaPt2 = 0.;
-
-  //  int run = iEvent.id().run();
-  //  int evt = iEvent.id().event();
 
   //for real data
   //primary vertices
   edm::Handle<reco::VertexCollection> pvHandle;
   iEvent.getByLabel("offlinePrimaryVertices", pvHandle);
-  //  int numberOfVertices = pvHandle->size();
   const reco::VertexCollection & vertices = *pvHandle.product();
   reco::VertexCollection::const_iterator myPV;
 
@@ -392,11 +365,9 @@ void NewMuonAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
   edm::Handle<vector<reco::PFMET> > pfMEThandle;
   iEvent.getByLabel("pfMet", pfMEThandle);
 
-  /////////susy
   const PFMETCollection *pfmetcol = pfMEThandle.product();
   const MET *pf_Met = &(pfmetcol->front());
   double pf_MET_pt = pf_Met->pt();
-  /////////susy end
 
   // Transform Track into TransientTrack
   edm::ESHandle<TransientTrackBuilder> theTransientTrackBuilder;
@@ -411,13 +382,6 @@ void NewMuonAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
   const double muonRestMass_kvadrat = 0.105658367 * 0.105658367;
   const double PI = 4.0 * atan(1.0);
 
-  //needed for Collins Soper framework
-  //  double costhetaGen = -10.0; //ok
-  //  double sin2thetaGen = -10.0; //ok
-  //  double tanphiGen = -10.0; //ok
-  //  double resGen[3] = { -10., -10., -10. };
-  //end CS
-
   if (mcdata)
   {
     //Get the GenParticleCandidates
@@ -425,8 +389,6 @@ void NewMuonAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
     iEvent.getByLabel("genParticles", theCandidateCollectionHandle);
     theGenParticleCollection = theCandidateCollectionHandle.product();
     reco::GenParticleCollection::const_iterator genP;
-
-    //  double pT_leading_gen = 0.;
 
     int countZstargen = 0;
     for (genP = theCandidateCollectionHandle->begin(); genP != theCandidateCollectionHandle->end(); genP++)
@@ -439,15 +401,12 @@ void NewMuonAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
         {
           if (fabs(genParticle.pdgId()) == 1 || fabs(genParticle.pdgId()) == 3 || fabs(genParticle.pdgId()) == 5)
           {
-            // if((genParticle.pdgId() * genParticle.pdgId()) < 0)
             {
               if (fabs(genParticle.daughter(0)->pdgId()) == 13 && fabs(genParticle.daughter(1)->pdgId()) == 13
                   && (genParticle.daughter(0)->pdgId() * genParticle.daughter(1)->pdgId() < 0.))
               {
                 countZstargen++;
-                //   std::cout << "genParticle.pdgId() = " << genParticle.pdgId() << std::endl;
               }
-              //   std::cout << "countZstargen = " << countZstargen << std::endl;
               if (countZstargen == 2)
               {
                 genMuons.push_back(genParticle.daughter(0));
@@ -462,7 +421,7 @@ void NewMuonAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
       if (DY_)
       {
         if (genParticle.status() == 3 && (genParticle.pdgId() == 23 || genParticle.pdgId() == 21)
-            && genParticle.numberOfDaughters() == 3) //rumi
+            && genParticle.numberOfDaughters() == 3)
         {
           if (fabs(genParticle.daughter(0)->pdgId()) == 13 && fabs(genParticle.daughter(1)->pdgId()) == 13
               && (genParticle.daughter(0)->pdgId() * genParticle.daughter(1)->pdgId() < 0.))
@@ -473,8 +432,6 @@ void NewMuonAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
         }
       }
     }
-    //   std::cout << "size of genMuons = " << genMuons.size() << std::endl;
-
     if (genMuons.size() > 1)
     {
       const Candidate * dmu1 = genMuons[0];
@@ -498,11 +455,7 @@ void NewMuonAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
         math::XYZTLorentzVector muonche1_gen_Zcm(ZmumuCMBoost_gen(muonche1_gen)); //CM
         math::XYZTLorentzVector muonche2_gen_Zcm(ZmumuCMBoost_gen(muonche2_gen)); //CM
         //3 merni impulsi na bozonite v lab sys
-        Basic3DVectorD Zmu_3P_gen(motherParticle_globFit_gen.Px(), motherParticle_globFit_gen.Py(),
-            motherParticle_globFit_gen.Pz());
-        //3D impulsi na mu v CM na bozona - ne gi izpolzvam
-        // za triene       Basic3DVectorD muonche1_gen_Zcm_3D(muonche1_gen_Zcm.Px(), muonche1_gen_Zcm.Py(), muonche1_gen_Zcm.Pz());
-        // za triene       Basic3DVectorD muonche2_gen_Zcm_3D(muonche2_gen_Zcm.Px(), muonche2_gen_Zcm.Py(), muonche2_gen_Zcm.Pz());
+        Basic3DVectorD Zmu_3P_gen(motherParticle_globFit_gen.Px(), motherParticle_globFit_gen.Py(), motherParticle_globFit_gen.Pz());
 
         Basic3DVectorD MuMin_3p_gen(0., 0., 0.);
         Basic3DVectorD MuPlus_3p_gen(0., 0., 0.);
@@ -530,7 +483,6 @@ void NewMuonAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
           Basic3DVectorD myMuPlus_3p_gen(muonche2_gen_Zcm.px(), muonche2_gen_Zcm.py(), muonche2_gen_Zcm.pz());
           MuMin_3p_gen = myMuMin_3p_gen;
           MuPlus_3p_gen = myMuPlus_3p_gen;
-
         }
         else
         {
@@ -548,40 +500,11 @@ void NewMuonAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
           MuMin_3p_gen = myMuMin_3p_gen;
           MuPlus_3p_gen = myMuPlus_3p_gen;
         }
-
-        //      double mydeltaEtaGen = my_etaMuGen - my_etaMuBarGen;
-
-        //za triene      TLorentzVector motherParticleGen = (MuGen1 + MuGen2);
         TLorentzVector motherParticleGen = (MuGen + MuGenBar);
         Massgenerated = motherParticleGen.M();
-        if(!(Massgenerated >= massMin)) return;
-        /*            Massgenerated_out = Massgenerated;
+        if(!(Massgenerated >= massMin))
+          return;
 
-                     if(!(Massgenerated >= massMin)) continue;
-         */
-        //      double BosonPtGeN = motherParticleGen.Pt();
-        //      double Boson_rapidityGen = 0.5 * log((motherParticleGen.E() + motherParticleGen.Pz()) / (motherParticleGen.E()- motherParticleGen.Pz()));
-        //      double Boson_PhiGen = acos((motherParticleGen.Px()) / BosonPtGeN);
-        /*
-
-         //calculate CS variables for gen Particle
-         calCSVariables(MuGen, MuGenBar, resGen, motherParticleGen.Pz() < 0.0);
-         costhetaGen = resGen[0];
-         //      sin2thetaGen = resGen[1];
-         tanphiGen = resGen[2];
-
-         sin2thetaGen = 1 - (costhetaGen * costhetaGen);
-
-         double myfDeltaEtaGen = abs(mydeltaEtaGen);
-         if (my_ptMuGen >= my_ptMuBarGen)
-         {
-         pT_leading_gen = my_ptMuGen;
-         }
-         else
-         {
-         pT_leading_gen = my_ptMuBarGen;
-         }
-         */
         const double m = Massgenerated;
         const double m_denom = Massgenerated;
         acceptanceDenom->Fill(m_denom);
@@ -619,39 +542,27 @@ void NewMuonAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
   }
   //get trigger collection from the event
   iEvent.getByLabel(trigTag_, triggerResults);
-  // TriggerNames trigNames;
-  // trigNames.init(*triggerResults);
   //get trigger names from the trigger results in the event
   trigNames_ = &iEvent.triggerNames(*triggerResults);
   bool trigger_fired = false;
 
-//  unsigned int nn = HLTPathsByName_.size();
-
   for (unsigned int i = 0; (i < triggerResults->size()) && (!trigger_fired); i++)
   {
     std::string trigName = trigNames_->triggerName(i);
-//     std::cout << "triggerName (" << i << ") = " << trigName << std::endl;
-    // check whether HLT_Mu40_eta2p1_v9 exist in the list with trigger names and whether it is accepted
-//    for (unsigned int l = 0; l < nn; l++)
- //   {
-      //    if (trigName == hltPath_ && triggerResults->accept(i)) //samo za edin konkreten trigger path
-
+// std::cout << "triggerName (" << i << ") = " << trigName << std::endl;
       if (!(trigName == HLTPathsByName_ && triggerResults->accept(i)))
         continue;
       else
       {
-//              std::cout << HLTPathsByName_ << " path is the current hlt path" << std::endl;
+// std::cout << HLTPathsByName_ << " path is the current hlt path" << std::endl;
         trigger_fired = true;
-        //      std::cout << "trigger_fired = " << trigger_fired << std::endl;
         break; //break if trigger is fired
       }
-//    }//
   }
-  //    std::cout << "trigger_fired = " << trigger_fired << std::endl;
 
   // get trigger event by label "trigEv_.encode() == hltTriggerSummaryAOD::HLT"
   edm::Handle<trigger::TriggerEvent> handleTriggerEvent;
-  //  std::cout << ">>> Trigger bit: " << trigger_fired << " (" << hltPath_ << ")" << std::endl;
+  // std::cout << ">>> Trigger bit: " << trigger_fired << " (" << hltPath_ << ")" << std::endl;
   if (!iEvent.getByLabel(trigEv_, handleTriggerEvent))
   {
     std::cout << "trigger::TriggerEvent product with InputTag " << trigEv_.encode() << " not in event";
@@ -660,8 +571,6 @@ void NewMuonAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
 
   iEvent.getByLabel(trigEv_, handleTriggerEvent);
   const trigger::TriggerObjectCollection & toc(handleTriggerEvent->getObjects());
-  //  size_t nMuHLT = 0;
-  //ne raboti  size_t nL1 = 0;
   std::vector<reco::Particle> HLTMuMatched;
   //loop over the trigger filters (~ 500)
   for (size_t ia = 0; ia < handleTriggerEvent->sizeFilters(); ++ia)
@@ -679,41 +588,20 @@ void NewMuonAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
     if (&toc != 0)
     {
       const trigger::Keys & k = handleTriggerEvent->filterKeys(ia);
-      //  loop over trigger keys for the given trigger filter
-      //  for (trigger::Keys::const_iterator ki = k.begin(); ki != k.end() && nMuHLT < 2; ++ki)
       for (trigger::Keys::const_iterator ki = k.begin(); ki != k.end(); ++ki)
       {
-        //loop over L3 trigger filters
-        //  for (unsigned int kk = 0; kk < L3FilterName_.size() && nMuHLT < 2; ++kk)
-        //  for (unsigned int kk = 0; kk < L3FilterName_.size(); ++kk)
-        //  {
-        //    if (name == L3FilterName_[kk])
         if (name.compare(L3FilterName_) == 0)
         {
-          //            std::cout << L3FilterName_[kk] << std::endl;
           HLTMuMatched.push_back(toc[*ki].particle());
-          //          nMuHLT++;
         }
-        //  }
-        /*
-         //sledva6tiat if ne e towa, koeto triabva
-         if (name == L1FilterName_)
-         {
-         nL1++;
-         }
-         */
       }
     }
   }
 
-  //  std::cout << "nMuHLT = " << nMuHLT << std::endl;
-  //ne raboti  std::cout << "nL1 = " << nL1 << std::endl;
-
   //if the hlt is fired check whether pt(HLT mu) and eta(HLT mu) pass the criteria (40 GeV, 2.1)
-  //overridden = preodolian
   bool hlt_pass_overridden = false;
   unsigned int dim = HLTMuMatched.size();
-  //    std::cout << "HLTMuMatched.size() = " << dim << std::endl;
+  // std::cout << "HLTMuMatched.size() = " << dim << std::endl;
   bool pass = false;
   if (dim != 0)
   {
@@ -726,7 +614,7 @@ void NewMuonAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
       }
     }
   }
-  //  std::cout << "pass = " << pass << std::endl;
+  // std::cout << "pass = " << pass << std::endl;
 
   if (!pass)
     hlt_pass_overridden = true; //???
@@ -738,7 +626,6 @@ void NewMuonAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
   {
     HLTEffDenom->Fill(Massgenerated);
   }
-
   if (trigger_fired)
   {
     if (hlt_pass_overridden)
@@ -752,7 +639,6 @@ void NewMuonAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
       hlt_or = true;
     }
   }
-
   //L1 trigger
   Handle<L1GlobalTriggerReadoutRecord> l1GtRR;
   iEvent.getByLabel("gtDigis", l1GtRR);
@@ -762,8 +648,7 @@ void NewMuonAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
 
   L1GlobalTriggerReadoutRecord L1GTRR = *l1GtRR.product();
 
-  // In the new format the names are not in the event data,
-  // They are in the ParameterSet registry
+  // In the new format the names are not in the event data, but they are in the ParameterSet registry
   edm::pset::Registry* psetRegistry = edm::pset::Registry::instance();
   edm::ParameterSet const* pset = psetRegistry->getMapped(gtObjectMaps->namesParameterSetID());
   if (pset == 0)
@@ -773,7 +658,6 @@ void NewMuonAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
     ex.addContext("Calling CompareToObjectMapRecord::analyze");
     throw ex;
   }
-
   if (check_l1)
   {
     std::vector<int> algoBitNumbers2;
@@ -785,8 +669,8 @@ void NewMuonAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
     {
       if ((algoNames2.at(*iBit)).compare(m_nameAlgTechTrig) == 0.)
       {
-        //        std::cout << "algoNames2 at(" << *iBit << ") = " << algoNames2.at(*iBit) << std::endl;
-        //        std::cout << "algo results at (" << *iBit << ") = " << gtObjectMaps->algorithmResult(*iBit) << std::endl;
+        // std::cout << "algoNames2 at(" << *iBit << ") = " << algoNames2.at(*iBit) << std::endl;
+        // std::cout << "algo results at (" << *iBit << ") = " << gtObjectMaps->algorithmResult(*iBit) << std::endl;
         l1_or = true;
       }
     }
@@ -807,17 +691,15 @@ void NewMuonAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
     }
   }
 
-//  if(!(Massgenerated<(massMin+0.5) && Massgenerated<(massMin-0.5)))
-//    return;
-
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //start analyze reco data
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   if (!(pvHandle.isValid() && muSize > 1))
 
     return; // not valid PV collection or number of muons less than two -> skip the event
 
   std::pair<reco::Muon, double> pairMuonVsDeltaR;
   std::vector<std::pair<reco::Muon, double> > viMuonVsDeltaR;
-  //  bool allvrtxpassed = false; // peicho // if vtrx coordinates are filled in the histograms
   map<vector<reco::Muon>*, double> mapVrtxMuMu;
 
   if (!(dim > 0))//continue if HLT was not fired and L3 filter is not passed
@@ -908,21 +790,11 @@ void NewMuonAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
       reco::TransientTrack tsk1 = theTransientTrackBuilder->build(*muTeVOptOne);
       reco::TransientTrack tsk2 = theTransientTrackBuilder->build(*muTeVOptTwo);
 
-      /*
-       TwoTrackMinimumDistance md;
-       md.calculate(tsk1.initialFreeState(), tsk2.initialFreeState());
-       //      float minAppDist = md.distance();
-
-       GlobalPoint gPo = md.crossingPoint();
-       double GlobPontX = gPo.x();
-       double GlobPontY = gPo.y();
-       double GlobPontZ = gPo.z();
-       */
       vector<TransientTrack> MuMuTT_main;
       MuMuTT_main.push_back(tsk1);
       MuMuTT_main.push_back(tsk2);
 
-      //      KalmanVertexFitter kvf_main;
+      // KalmanVertexFitter kvf_main;
       KalmanVertexFitter kvf_main(true);
       std::vector<double> muMasses;
       muMasses.push_back(0.1056583715);// muon rest mass
@@ -933,9 +805,7 @@ void NewMuonAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
       CachingVertex<5> VtxForInvMass = kvf_main.vertex(MuMuTT_main);
       Measurement1D MassWErr = massCalculator.invariantMass(VtxForInvMass, muMasses);
       double massVrtx = MassWErr.value();
-      //      double massVrtx_error = MassWErr.error();
-
-//      totalrecoNoSelectNom->Fill(massVrtx); // diMuMass no selected - combinatorial
+      // double massVrtx_error = MassWErr.error();
 
       // selection
       if (vertexZstar_main.isFake() || !vertexZstar_main.isValid())
@@ -943,14 +813,12 @@ void NewMuonAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
 
       double chi2prob_main = ChiSquaredProbability(vertexZstar_main.chi2(), vertexZstar_main.ndof());
       double vertexChi2 = vertexZstar_main.chi2();
-      //      double chi2norm_main = vertexZstar_main.normalizedChi2();
-      //      double vertexNdof = vertexZstar_main.ndof();
+      // double chi2norm_main = vertexZstar_main.normalizedChi2();
+      // double vertexNdof = vertexZstar_main.ndof();
 
       //XYZTLorentzVector is needed only for boost to CM
-      math::XYZTLorentzVector Mu1(muTeVOptOne->px(), muTeVOptOne->py(), muTeVOptOne->pz(), sqrt(muTeVOptOne->p()
-          * muTeVOptOne->p() + muonRestMass_kvadrat)); //
-      math::XYZTLorentzVector Mu2(muTeVOptTwo->px(), muTeVOptTwo->py(), muTeVOptTwo->pz(), sqrt(muTeVOptTwo->p()
-          * muTeVOptTwo->p() + muonRestMass_kvadrat)); //
+      math::XYZTLorentzVector Mu1(muTeVOptOne->px(), muTeVOptOne->py(), muTeVOptOne->pz(), sqrt(muTeVOptOne->p() * muTeVOptOne->p() + muonRestMass_kvadrat)); //
+      math::XYZTLorentzVector Mu2(muTeVOptTwo->px(), muTeVOptTwo->py(), muTeVOptTwo->pz(), sqrt(muTeVOptTwo->p() * muTeVOptTwo->p() + muonRestMass_kvadrat)); //
       math::XYZTLorentzVector motherParticle_globFit = (Mu1 + Mu2);
 
       //TLorentzVector is needed to calculate CS vars and distributions
@@ -964,27 +832,14 @@ void NewMuonAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
       math::XYZTLorentzVector muonche1_Zcm(ZmumuCMBoost(Mu1)); //CM
       math::XYZTLorentzVector muonche2_Zcm(ZmumuCMBoost(Mu2)); //CM
 
-      //3D boson momentum - not used
-      Basic3DVectorD Zmu_3P(motherParticle.Px(), motherParticle.Py(), motherParticle.Pz());
-
       //3D muon momenta in the boson rest frame
       Basic3DVectorD muonche1_Zcm_3D(muonche1_Zcm.Px(), muonche1_Zcm.Py(), muonche1_Zcm.Pz());
       Basic3DVectorD muonche2_Zcm_3D(muonche2_Zcm.Px(), muonche2_Zcm.Py(), muonche2_Zcm.Pz());
-      //      double P_lepton1CM = muonche1_Zcm.P();
-      //      double P_lepton2CM = muonche2_Zcm.P();
-      //      double Pz_lepton1CM = muonche1_Zcm.Pz();
-      //      double Pz_lepton2CM = muonche2_Zcm.Pz();
-      //      double Pt_lepton1CM = muonche1_Zcm.Pt();
-      //      double Pt_lepton2CM = muonche2_Zcm.Pt();
-      //      double Phi_lepton1CM = atan(Pt_lepton1CM / Pz_lepton1CM);
-      //      double Phi_lepton2CM = atan(Pt_lepton2CM / Pz_lepton2CM);
-
       double angle = acos((muTeVOptOne->momentum().Dot(muTeVOptTwo->momentum()))
           / (muTeVOptOne->p() * muTeVOptTwo->p()));
 
       // selection
-      if (!(((fabs(muTeVOptOne->eta()) < 2.4) && (fabs(muTeVOptTwo->eta()) < 2.1)) || ((fabs(muTeVOptOne->eta()) < 2.1)
-          && (fabs(muTeVOptTwo->eta()) < 2.4))))
+      if (!(((fabs(muTeVOptOne->eta()) < 2.4) && (fabs(muTeVOptTwo->eta()) < 2.1)) || ((fabs(muTeVOptOne->eta()) < 2.1) && (fabs(muTeVOptTwo->eta()) < 2.4))))
         continue; // |eta| < 2.4 cut
       // selection
       if (!(amuon1->isIsolationValid() && amuon2->isIsolationValid() && ((amuon1->isolationR03().sumPt)
@@ -1002,14 +857,14 @@ void NewMuonAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
       // selection
       if (!(tk1->hitPattern().trackerLayersWithMeasurement() > trackLayersCut
           && tk2->hitPattern().trackerLayersWithMeasurement() > trackLayersCut))
-        continue; // more than 5 subsequent layers
+        continue; // more than 5 layers
       // selection
       if (!(muTeVOptOne->pt() > pTcut && muTeVOptTwo->pt() > pTcut))
         continue; // Pt higher than 45.
 
       // selection
       if (!(fabs(angle) < (PI - angleCut)))
-        continue; // angle (p_mu1,p_mu2) da se proveri!!!
+        continue;
 
       //selection
       if (!((muTeVOptOne->ptError() / muTeVOptOne->pt() < 0.3) && (muTeVOptTwo->ptError() / muTeVOptTwo->pt() < 0.3)))
@@ -1021,22 +876,16 @@ void NewMuonAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
       map<vector<reco::Muon>*, double> mapa;
       std::vector<double> dtv_vi;
 
-      // loop over primary vetexs
-      for (myPV = vertices.begin(); myPV != vertices.end(); myPV++)
-      {
-        if (!((myPV->ndof() >= 4) && (fabs(myPV->z()) <= 24.) && (fabs(myPV->position().rho()) <= 2.)))
-        {
+        const reco::Vertex pv = pvHandle->front();
+        if (!((pv.ndof() >= 4) && (fabs(pv.z()) <= 24.) && (fabs(pv.position().rho()) <= 2.)))
           continue;
-        }
-        reco::Vertex pv = (*myPV);
-        //        if (!(pv.isValid() && !pv.isFake() && pv.tracksSize() > 1))
         if (!(pv.isValid() && !pv.isFake()))
-          continue; // fake invalid pv and at least 4 track associated
+          continue;
         double dtv;
         double dtvA;
-        double pvX = myPV->x();
-        double pvY = myPV->y();
-        double pvZ = myPV->z();
+        double pvX = pv.x();
+        double pvY = pv.y();
+        double pvZ = pv.z();
 
         // selection
         if (!(fabs(muTeVOptOne->dxy(pv.position())) < dxyCut && fabs(muTeVOptTwo->dxy(pv.position())) < dxyCut))
@@ -1045,27 +894,10 @@ void NewMuonAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
         // selection
         if (!(fabs(muTeVOptOne->dz(pv.position())) < dzCut && fabs(muTeVOptTwo->dz(pv.position())) < dzCut))
           continue; // (PV - track) z position < 0.5
-
-
-        //        double Dxy1 = muTeVOptOne->dxy(pv.position());
-        //        double Dxy2 = muTeVOptTwo->dxy(pv.position());
-
-        //        double deltaDxy;
-        //        double deltaDz;
-        //        double fDeltaDz;
-
-        //        deltaDxy = (muTeVOptTwo->dxy(pv.position()) - muTeVOptOne->dxy(pv.position())) * amuon1->charge();
-        //        deltaDz = (muTeVOptTwo->dz(pv.position()) - muTeVOptOne->dz(pv.position())) * amuon1->charge();
-        //        fDeltaDz = fabs(deltaDz);
-
         // selection
+
         if (!(vertexChi2 <= vrtxCh2Cut))
           continue;
-
-        //        //selection - tight criteria for the diMu vrtx
-        //        if (!(chi2prob_main >= chi2ProbCut))
-        //          continue;
-
 
         dtv = sqrt((vertexZstar_main.x() - pvX) * (vertexZstar_main.x() - pvX) + (vertexZstar_main.y() - pvY)
             * (vertexZstar_main.y() - pvY) + (vertexZstar_main.z() - pvZ) * (vertexZstar_main.z() - pvZ)); //
@@ -1075,8 +907,6 @@ void NewMuonAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
         mu_vi->push_back(*amuon1);
         mu_vi->push_back(*amuon2);
         mapa[mu_vi] = dtv;
-      } // loop over the vertex
-      //      allvrtxpassed = true;
 
       if (dtv_vi.size() > 0)
       {
@@ -1091,7 +921,6 @@ void NewMuonAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
   if (mapVrtxMuMu.size() > 0)
   {
     std::pair<vector<reco::Muon>*, double> min_vrtx = *min_element(mapVrtxMuMu.begin(), mapVrtxMuMu.end(), my_compare);
-    //    double veryMinVrtx = min_vrtx.second;
 
     std::vector<reco::Muon>* selectedMuMu = min_vrtx.first;
     reco::Muon muon1 = (*selectedMuMu)[0];
@@ -1103,16 +932,11 @@ void NewMuonAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
     reco::TransientTrack tsk11 = theTransientTrackBuilder->build(*muTeVOptOne);
     reco::TransientTrack tsk22 = theTransientTrackBuilder->build(*muTeVOptTwo);
 
-    /*
-     TwoTrackMinimumDistance md;
-     md.calculate(tsk11.initialFreeState(), tsk22.initialFreeState());
-     //    float minAppDist = md.distance();
-     */
     vector<TransientTrack> MuMuTT;
     MuMuTT.push_back(tsk11);
     MuMuTT.push_back(tsk22);
 
-    //    KalmanVertexFitter kvf;
+    // KalmanVertexFitter kvf;
     std::vector<double> muMasses;
     muMasses.push_back(0.1056583715);
     muMasses.push_back(0.1056583715);
@@ -1128,12 +952,7 @@ void NewMuonAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
     double massVrtx_error = MassWErr.error();
 
     reco::Vertex vertexZstar = tvZstar;
-    /*
-     double chi2norm = vertexZstar.normalizedChi2();
-     double chi2prob = ChiSquaredProbability(vertexZstar.chi2(), vertexZstar.ndof());
-     double vertexChi2 = vertexZstar.chi2();
-     double vertexNdof = vertexZstar.ndof();
-     */
+
     //needed for Collins Soper framework
     double costheta = -10.0;
     double sin2theta = -10.0;
@@ -1162,17 +981,6 @@ void NewMuonAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
     //3D muon momenta in the boson rest frame
     Basic3DVectorD muonche1_Zcm_3D(muonche1_Zcm.Px(), muonche1_Zcm.Py(), muonche1_Zcm.Pz());
     Basic3DVectorD muonche2_Zcm_3D(muonche2_Zcm.Px(), muonche2_Zcm.Py(), muonche2_Zcm.Pz());
-    //    double P_lepton1CM = muonche1_Zcm.P();
-    //    double Pz_lepton1CM = muonche1_Zcm.Pz();
-    //    double Pz_lepton2CM = muonche2_Zcm.Pz();
-    //    double Pt_lepton1CM = muonche1_Zcm.Pt();
-    //    double Pt_lepton2CM = muonche2_Zcm.Pt();
-    //    double Phi_lepton1CM = atan(Pt_lepton1CM / Pz_lepton1CM);
-    //    double Phi_lepton2CM = atan(Pt_lepton2CM / Pz_lepton2CM);
-    //    double angle = acos((muon1.momentum().Dot(muon2.momentum())) / (muon1.p() * muon2.p()));
-    //    double Phi_leptonMinCM = 0.;
-    //    double Phi_leptonPluCM = 0.;
-    //    double pT_leading;
 
     double muonMinEta;
     double muonPlusEta;
@@ -1184,20 +992,6 @@ void NewMuonAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
 
     Basic3DVectorD MuMin_3p(0., 0., 0.);
     Basic3DVectorD MuPlus_3p(0., 0., 0.);
-    /*
-     double BosonPt = motherParticle.Pt();
-     double Boson_rapidity = 0.5 * log((motherParticle.E() + motherParticle.Pz()) / (motherParticle.E() - motherParticle.Pz()));
-     double Boson_Phi = acos((motherParticle.Px()) / BosonPt);
-
-     const PFMETCollection *pfmetcol = pfMEThandle.product();
-     const MET *pf_Met = &(pfmetcol->front());
-     double pf_MET_pt = pf_Met->pt();
-     //metPhi
-     double Met_phi = pf_Met->phi();
-     double MetBosonPhi = Met_phi - Boson_Phi;
-     double cosMetBosonPhi = cos(Met_phi - Boson_Phi);
-     double MassTransvBosonMet = sqrt(2 * fabs(BosonPt) * fabs(pf_MET_pt) * (1 - cosMetBosonPhi));
-     */
     if (muon1.charge() < 0) //mu1 = mu- && mu2 = mu+
     {
       muonMinEta = muTeVOptOne->eta();
@@ -1206,13 +1000,6 @@ void NewMuonAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
       muonPlusPhi = muon2.phi();
       ptMuonNegReco = muTeVOptOne->pt();
       ptMuonPlusReco = muTeVOptTwo->pt();
-      /*
-       MuMin_3p = muonche1_Zcm_3D;
-       MuPlus_3p = muonche2_Zcm_3D;
-
-       Phi_leptonMinCM = Phi_lepton1CM;
-       Phi_leptonPluCM = Phi_lepton2CM;
-       */
       calCSVariables(MuBestFit1, MuBestFit2, res, motherParticle.Pz() < 0.0);
       costheta = res[0];
       sin2theta = res[1];
@@ -1227,13 +1014,7 @@ void NewMuonAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
       muonPlusPhi = muon1.phi();
       ptMuonNegReco = muTeVOptTwo->pt();
       ptMuonPlusReco = muTeVOptOne->pt();
-      /*
-       MuMin_3p = muonche2_Zcm_3D;
-       MuPlus_3p = muonche1_Zcm_3D;
 
-       Phi_leptonMinCM = Phi_lepton2CM;
-       Phi_leptonPluCM = Phi_lepton1CM;
-       */
       calCSVariables(MuBestFit2, MuBestFit1, res, motherParticle.Pz() < 0.0);
       costheta = res[0];
       sin2theta = res[1];
@@ -1278,17 +1059,6 @@ void NewMuonAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
     double cosMetBosonPhi = cos(Met_phi - Boson_Phi);
     double MassTransvBosonMet = sqrt(2 * fabs(BosonPt) * fabs(pf_MET_pt) * (1 - cosMetBosonPhi));
     MassTransvBosonMet_vs_pfMet->Fill(MassTransvBosonMet, pf_MET_pt);
-
-    /*
-     if (ptMuonNegReco >= ptMuonPlusReco)
-     {
-     pT_leading = ptMuonNegReco;
-     }
-     else
-     {
-     pT_leading = ptMuonPlusReco;
-     }
-     */
 
     if (mcdata)
     {
@@ -1415,7 +1185,6 @@ void NewMuonAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
               diff_SelDphiBosonMassMCMatchMyMass->Fill(motherParticleGenVsreco - motherParticle.M());
             }
           }//end flags deltaR & deltaPt
-          ///////
           MCFlag11Nopt = IsMuMatchedToMCZ1(dmu1GenVsreco, muon1, maxDeltaR_);
           MCFlag12Nopt = IsMuMatchedToMCZ1(dmu1GenVsreco, muon2, maxDeltaR_);
           if (MCFlag11Nopt > 0)
@@ -1448,42 +1217,42 @@ void NewMuonAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
       }
 
       /*
-       //      if (sin2theta < sin2ThetaCut && (motherParticle.M() > minSignalRangeCut) && (motherParticle.M()
-       if (sin2theta < sin2ThetaCut && (massVrtx > minSignalRangeCut) && (massVrtx < maxSignalRangeCut))
-       {
-       if (pf_MET_pt > checkMetCut)
-       {
-       //          std::cout << "evt = " << evt << "\trun = " << run << "\tlumi = " << iEvent.luminosityBlock() << "\tMET = "
-       //              << pf_MET_pt << "\tsin2theta = " << sin2theta << "\tmass = " << motherParticle.M() << std::endl;
-       << pf_MET_pt << "\tsin2theta = " << sin2theta << "\tmass = " << massVrtx << std::endl;
-       }
-       }
+// if (sin2theta < sin2ThetaCut && (motherParticle.M() > minSignalRangeCut) && (motherParticle.M()
+if (sin2theta < sin2ThetaCut && (massVrtx > minSignalRangeCut) && (massVrtx < maxSignalRangeCut))
+{
+if (pf_MET_pt > checkMetCut)
+{
+// std::cout << "evt = " << evt << "\trun = " << run << "\tlumi = " << iEvent.luminosityBlock() << "\tMET = "
+// << pf_MET_pt << "\tsin2theta = " << sin2theta << "\tmass = " << motherParticle.M() << std::endl;
+<< pf_MET_pt << "\tsin2theta = " << sin2theta << "\tmass = " << massVrtx << std::endl;
+}
+}
 
-       // z pick
-       //      if (sin2theta < sin2ThetaCut && (motherParticle.M() > minZpeak) && (motherParticle.M() < maxZpeak))
-       if (sin2theta < sin2ThetaCut && (massVrtx > minZpeak) && (massVrtx < maxZpeak))
-       {
-       }
-       // background [300,400] left
-       //      if (sin2theta < sin2ThetaCut && (motherParticle.M() > leftBandMin) && (motherParticle.M() <= leftBandMax))
-       if (sin2theta < sin2ThetaCut && (massVrtx > leftBandMin) && (massVrtx <= leftBandMax))
-       {
-       }
-       // background [450,700] rigth
-       //      if (sin2theta < sin2ThetaCut && (motherParticle.M() > rightBandMin) && (motherParticle.M() <= rightBandMax))
-       if (sin2theta < sin2ThetaCut && (massVrtx > rightBandMin) && (massVrtx <= rightBandMax))
-       {
-       }
-       // signal region [400,450]
-       //      if (sin2theta < sin2ThetaCut && (motherParticle.M() > signalBandMin) && (motherParticle.M() <= signalBandMax))
-       if (sin2theta < sin2ThetaCut && (massVrtx > signalBandMin) && (massVrtx <= signalBandMax))
-       {
-       //        std::cout << "motherParticle mass = " << motherParticle.M() << "\tmassVrtx = " << massVrtx << "\terr = " << massVrtx_error << std::endl;
-       }
-       if (sin2theta < sin2ThetaCut)
-       {
-       }
-       */
+// z pick
+// if (sin2theta < sin2ThetaCut && (motherParticle.M() > minZpeak) && (motherParticle.M() < maxZpeak))
+if (sin2theta < sin2ThetaCut && (massVrtx > minZpeak) && (massVrtx < maxZpeak))
+{
+}
+// background [300,400] left
+// if (sin2theta < sin2ThetaCut && (motherParticle.M() > leftBandMin) && (motherParticle.M() <= leftBandMax))
+if (sin2theta < sin2ThetaCut && (massVrtx > leftBandMin) && (massVrtx <= leftBandMax))
+{
+}
+// background [450,700] rigth
+// if (sin2theta < sin2ThetaCut && (motherParticle.M() > rightBandMin) && (motherParticle.M() <= rightBandMax))
+if (sin2theta < sin2ThetaCut && (massVrtx > rightBandMin) && (massVrtx <= rightBandMax))
+{
+}
+// signal region [400,450]
+// if (sin2theta < sin2ThetaCut && (motherParticle.M() > signalBandMin) && (motherParticle.M() <= signalBandMax))
+if (sin2theta < sin2ThetaCut && (massVrtx > signalBandMin) && (massVrtx <= signalBandMax))
+{
+// std::cout << "motherParticle mass = " << motherParticle.M() << "\tmassVrtx = " << massVrtx << "\terr = " << massVrtx_error << std::endl;
+}
+if (sin2theta < sin2ThetaCut)
+{
+}
+*/
     }
   }
 }
@@ -1493,9 +1262,7 @@ bool NewMuonAna::IsMuMatchedToMCZ(const reco::Candidate * dau, reco::Muon myMu, 
   unsigned int nPass = 0;
   {
     reco::TrackRef muTeVOpt = (muon::tevOptimized(myMu, 200, 17., 40., 0.25)).first;
-    if ((deltaR(myMu, *dau) < DR) && (fabs(muTeVOpt->pt() - dau->pt()) / muTeVOpt->pt() < DPtRel) && (dau->charge()
-        == myMu.charge()))
-    //    if ((deltaR(myMu, *dau) < DR) && (fabs(myMu.pt() - dau->pt()) / myMu.pt() < DPtRel) && (dau->charge() == myMu.charge()))
+    if ((deltaR(myMu, *dau) < DR) && (fabs(muTeVOpt->pt() - dau->pt()) / muTeVOpt->pt() < DPtRel) && (dau->charge() == myMu.charge()))
     {
       nPass++;
     }
@@ -1515,7 +1282,7 @@ bool NewMuonAna::IsMuMatchedToMCZ1(const reco::Candidate * dau, reco::Muon myMu,
   return (nPass > 0);
 }
 
-// ------------ method called once each job just before starting event loop  ------------
+// ------------ method called once each job just before starting event loop ------------
 void NewMuonAna::beginJob()
 {
   edm::Service<TFileService> fs;
@@ -1568,7 +1335,6 @@ void NewMuonAna::beginJob()
     h_resoMyMass = fs->make<TH1F>("resoMyMass", "resoMyMass", 10000, -50., 50.);
   }//end mcdata
 
-//  totalrecoNoSelectNom = fs->make<TH1F> ("totalrecoNoSelectNom", "totalrecoNoSelectNom", 4000, 0., 4000.);
   totalrecoNom = fs->make<TH1F> ("totalrecoNom", "totalrecoNom", 4000, 0., 4000.);
   totalrecoNomMyMass = fs->make<TH1F> ("totalrecoNomMyMass", "totalrecoNomMyMass", 4000, 0., 4000.);
 
@@ -1582,7 +1348,6 @@ void NewMuonAna::beginJob()
   recoHighPtSelNomMyMass_vs_AbsdeltaEta->SetXTitle("diMuMass [GeV/c^{2}]");
   recoHighPtSelNomMyMass_vs_AbsdeltaEta->SetYTitle("delta Eta");
 
-  ///susy
   recoHighPtSelNom_vs_pfMet = fs->make<TH2F> ("recoHighPtSelNom_vs_pfMet", "recoHighPtSelNom_vs_pfMet", 4000, 0., 1000., 4000, 0., 1000.);
   recoHighPtSelNom_vs_pfMet->SetXTitle("diMuMass [GeV/c^{2}]");
   recoHighPtSelNom_vs_pfMet->SetYTitle("met_pt [GeV/c]");
@@ -1593,7 +1358,6 @@ void NewMuonAna::beginJob()
   MassTransvBosonMet_vs_pfMet = fs->make<TH2F> ("MassTransv_vs_pfMet", "MassTransv_vs_pfMet", 4000, 0., 1000., 4000, 0., 1000.);
   MassTransvBosonMet_vs_pfMet->SetXTitle("MassTransv [GeV/c^{2}]");
   MassTransvBosonMet_vs_pfMet->SetYTitle("met_pt [GeV/c]");
-  ///susy
 
   totalrecoSelDphiNom = fs->make<TH1F> ("totalrecoSelDphiNom", "totalrecoSelDphiNom", 4000, 0., 4000.);
   totalrecoSelDphiNomMyMass = fs->make<TH1F> ("totalrecoSelDphiNomMyMass", "totalrecoSelDphiNomMyMass", 4000, 0., 4000.);
@@ -1604,36 +1368,15 @@ void NewMuonAna::beginJob()
   h_dif = fs->make<TH1F>("dif", "dif", 800, 0, 800);
 }
 
-// ------------ method called once each job just after ending the event loop  ------------
+// ------------ method called once each job just after ending the event loop ------------
 void NewMuonAna::endJob()
 {
-//  std::cout << "echo from endjob" << std::endl;
-//  std::cout << "the size of vicosthetaPlus = " << vicosthetaPlus.size() << std::endl;
-  double denomZero = 0.;
-  double denom = 0;
-  double nomZero = 0.;
-  double nom = 0.;
-
 
   for(unsigned int i = 0; i < vicosthetaPlus.size(); i++)
     {
-      if( (vicosthetaPlus[i]+vicosthetaZero[i]+vicosthetaMin[i]) > 0)
-        denomZero = 1.*(vicosthetaPlus[i]+vicosthetaZero[i]+vicosthetaMin[i]);
-      else
-        denomZero = 1.e-06;
-      if( (vicosthetaPlus[i]+vicosthetaMin[i]) > 0)
-        denom = 1.*(vicosthetaPlus[i]+vicosthetaMin[i]);
-      else
-        denom = 1.e-06;
-
-      nomZero = 1.*(vicosthetaPlus[i]+vicosthetaZero[i]-vicosthetaMin[i]);
-      nom = 1.*(vicosthetaPlus[i]-vicosthetaMin[i]);
-
-      std::cout << "mass < " << (i*5+5) << "\t" << "costhetaPlus = " << vicosthetaPlus[i] << "\t" 
+      std::cout << "mass < " << (i*5+5) << "\t" << "costhetaPlus = " << vicosthetaPlus[i] << "\t"
                                                   << "costhetaZero = " << vicosthetaZero[i] << "\t"
-                                                  << "costhetaMin = " << vicosthetaMin[i] << "\t"
-                                                  << "asimZero = " << nomZero/denomZero << "\t"
-                                                  << "asim = " << nom/denom << std::endl;
+                                                  << "costhetaMin = " << vicosthetaMin[i] << "\t" << std::endl;
 
       h_costhetaPlus->Fill(i, vicosthetaPlus[i]);
       h_costhetaMin->Fill(i, vicosthetaMin[i]);
@@ -1643,27 +1386,27 @@ void NewMuonAna::endJob()
     }
 }
 
-// ------------ method called when starting to processes a run  ------------
+// ------------ method called when starting to processes a run ------------
 void NewMuonAna::beginRun(edm::Run const&, edm::EventSetup const&)
 {
 }
 
-// ------------ method called when ending the processing of a run  ------------
+// ------------ method called when ending the processing of a run ------------
 void NewMuonAna::endRun(edm::Run const&, edm::EventSetup const&)
 {
 }
 
-// ------------ method called when starting to processes a luminosity block  ------------
+// ------------ method called when starting to processes a luminosity block ------------
 void NewMuonAna::beginLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&)
 {
 }
 
-// ------------ method called when ending the processing of a luminosity block  ------------
+// ------------ method called when ending the processing of a luminosity block ------------
 void NewMuonAna::endLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&)
 {
 }
 
-// ------------ method fills 'descriptions' with the allowed parameters for the module  ------------
+// ------------ method fills 'descriptions' with the allowed parameters for the module ------------
 void NewMuonAna::fillDescriptions(edm::ConfigurationDescriptions& descriptions)
 {
   //The following says we do not know what parameters are allowed so do no validation
